@@ -215,3 +215,11 @@ CREATE TABLE bitacora (
     fecha_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE password_reset_tokens (
+    id_token SERIAL PRIMARY KEY,
+    correo VARCHAR(100) NOT NULL,
+    token VARCHAR(6) NOT NULL,
+    expiracion TIMESTAMP NOT NULL,
+    utilizado BOOLEAN DEFAULT FALSE
+);
+
