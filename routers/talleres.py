@@ -391,3 +391,105 @@ def update_tecnico_ubicacion(id_tecnico: int, request: dict, db: Session = Depen
     tecnico.ubicacion_actual_longitud = request["longitud"]
     db.commit()
     return {"status": "success", "message": "Ubicación actualizada"}
+
+# --- NUEVOS ENDPOINTS PARA SERVICIOS Y ESPECIALIDADES ---
+
+@router.get("/servicios-disponibles")
+def get_servicios_disponibles(db: Session = Depends(get_db)):
+    return db.query(models.Servicio).all()
+
+@router.get("/{id_taller}/servicios")
+def get_taller_servicios(id_taller: int, db: Session = Depends(get_db)):
+    # Retorna los servicios activos para el taller
+    servicios = db.query(models.TallerServicio).filter(models.TallerServicio.id_taller == id_taller).all()
+    # Mapear con datos legibles
+    res = []
+    for s in servicios:
+        serv_base = db.query(models.Servicio).filter(models.Servicio.id_servicio == s.id_servicio).first()
+        res.append({
+            "id_taller_servicio": s.id_taller_servicio,
+            "id_servicio": s.id_servicio,
+            "nombre_servicio": serv_base.nombre_servicio if serv_base else "Servicio Desconocido",
+            "precio_especifico_taller": s.precio_especifico_taller,
+            "tiempo_estimado_minutos": s.tiempo_estimado_minutos,
+            "estado_disponible": s.estado_disponible
+        })
+    return res
+
+@router.post("/{id_taller}/servicios")
+def vincular_taller_servicio(id_taller: int, request: dict, db: Session = Depends(get_db)):
+    # request: { id_servicio: int, precio: float, tiempo: int }
+    if "id_servicio" not in request:
+        raise HTTPException(status_code=400, detail="id_servicio es requerido")
+    
+    # Validar duplicados
+    existe = db.query(models.TallerServicio).filter(
+        models.TallerServicio.id_taller == id_taller,
+        models.TallerServicio.id_servicio == request["id_servicio"]
+    ).first()
+    
+    if existe:
+        existe.precio_especifico_taller = request.get("precio", existe.precio_especifico_taller)
+        existe.tiempo_estimado_minutos = request.get("tiempo", existe.tiempo_estimado_minutos)
+        db.commit()
+        return {"status": "updated"}
+        
+    nuevo = models.TallerServicio(
+        id_taller=id_taller,
+        id_servicio=request["id_servicio"],
+        precio_especifico_taller=request.get("precio", 50.0),
+        tiempo_estimado_minutos=request.get("tiempo", 30),
+        estado_disponible=True
+    )
+    db.add(nuevo)
+    db.commit()
+    return {"status": "created"}
+
+@router.get("/especialidades-disponibles")
+def get_especialidades_disponibles(db: Session = Depends(get_db)):
+    return db.query(models.Especialidad).all()
+
+@router.get("/tecnicos/{id_tecnico}/especialidades")
+def get_tecnico_especialidades(id_tecnico: int, db: Session = Depends(get_db)):
+    # Consulta directa de relación
+    tecnico = db.query(models.Tecnico).filter(models.Tecnico.id_tecnico == id_tecnico).first()
+    if not tecnico:
+        raise HTTPException(status_code=404, detail="Técnico no encontrado")
+        
+    return [{"id_especialidad": e.id_especialidad, "nombre_especialidad": e.nombre_especialidad} for e in tecnico.especialidades]
+
+@router.post("/tecnicos/{id_tecnico}/especialidades")
+def vincular_tecnico_especialidad(id_tecnico: int, request: dict, db: Session = Depends(get_db)):
+    # request: { id_especialidad: int }
+    if "id_especialidad" not in request:
+        raise HTTPException(status_code=400, detail="id_especialidad es requerido")
+        
+    tecnico = db.query(models.Tecnico).filter(models.Tecnico.id_tecnico == id_tecnico).first()
+    esp = db.query(models.Especialidad).filter(models.Especialidad.id_especialidad == request["id_especialidad"]).first()
+    
+    if not tecnico or not esp:
+        raise HTTPException(status_code=404, detail="Técnico o Especialidad no encontrada")
+        
+    if esp not in tecnico.especialidades:
+        tecnico.especialidades.append(esp)
+        db.commit()
+        
+    return {"status": "linked"}
+
+@router.patch("/{id_taller}")
+def update_taller_perfil(id_taller: int, request: dict, db: Session = Depends(get_db)):
+    taller = db.query(models.Taller).filter(models.Taller.id_taller == id_taller).first()
+    if not taller:
+        raise HTTPException(status_code=404, detail="Taller no encontrado")
+        
+    if "telefono_taller" in request:
+        taller.telefono_taller = request["telefono_taller"]
+    if "cuenta_bancaria" in request:
+        taller.cuenta_bancaria = request["cuenta_bancaria"]
+    if "horario_apertura" in request:
+        taller.horario_apertura = request["horario_apertura"]
+    if "horario_cierre" in request:
+        taller.horario_cierre = request["horario_cierre"]
+        
+    db.commit()
+    return {"status": "success", "message": "Perfil actualizado"}
