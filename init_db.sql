@@ -14,6 +14,7 @@ CREATE TABLE clientes (
     foto_perfil_url VARCHAR(255),
     estado_cuenta VARCHAR(20) DEFAULT 'Activo',
     calificacion_promedio DECIMAL(3,2) DEFAULT 5.00,
+    fcm_token VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -97,6 +98,7 @@ CREATE TABLE tecnicos (
     ubicacion_actual_latitud FLOAT,
     ubicacion_actual_longitud FLOAT,
     estado_operativo VARCHAR(20) DEFAULT 'Disponible',
+    fcm_token VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_taller) REFERENCES talleres(id_taller) ON DELETE CASCADE
