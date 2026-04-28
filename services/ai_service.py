@@ -38,9 +38,13 @@ class AIService:
                 "{\n"
                 '  "categoria": "Motor | Eléctrico | Frenos | Llantas | Suspensión | Otro",\n'
                 '  "urgencia": "Alta | Media | Baja",\n'
-                '  "diagnostico_ia": "Breve resumen de lo que podría estar fallando según las evidencias.",\n'
+                '  "diagnostico_ia": "Diagnóstico inicial de la falla + consejos/herramientas recomendadas para el mecánico.",\n'
                 '  "especialidad_requerida": "Mecánico general, Electricista, etc."\n'
-                "}\n"
+                "}\n\n"
+                "Reglas para asignar 'urgencia':\n"
+                "- Alta: Si compromete la seguridad inmediata o hay peligro físico (ej: fallan frenos, humo/fuego).\n"
+                "- Media: El auto está varado pero el usuario no corre peligro (ej: batería muerta, llanta pinchada).\n"
+                "- Baja: El auto funciona pero tiene ruidos o averías menores (ej: aire acondicionado).\n\n"
                 f"Texto del usuario: {descripcion_texto}"
             )
             contents.append(prompt)
