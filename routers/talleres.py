@@ -226,13 +226,13 @@ def get_all_servicios(db: Session = Depends(get_db)):
     import models
     
     standard = [
-        {"nombre_servicio": "Paso de Corriente / Cambio de Batería", "tarifa_base_estimada": 50.0},
-        {"nombre_servicio": "Cambio y Reparación de Llantas", "tarifa_base_estimada": 40.0},
-        {"nombre_servicio": "Suministro de Combustible", "tarifa_base_estimada": 30.0},
-        {"nombre_servicio": "Cerrajería Automotriz de Emergencia", "tarifa_base_estimada": 80.0},
-        {"nombre_servicio": "Servicio de Grúa / Remolque", "tarifa_base_estimada": 150.0},
-        {"nombre_servicio": "Mecánica Ligera en Ruta", "tarifa_base_estimada": 100.0},
-        {"nombre_servicio": "Fugas de Fluidos y Sobrecalentamiento", "tarifa_base_estimada": 60.0}
+        {"nombre_servicio": "Diagnóstico por Escáner y Reparación de Sistemas Eléctricos", "tarifa_base_estimada": 50.0},
+        {"nombre_servicio": "Mantenimiento de Suspensión, Frenos y Neumáticos", "tarifa_base_estimada": 40.0},
+        {"nombre_servicio": "Suministro e Inspección Rápida de Fluidos (Aceite/Combustible)", "tarifa_base_estimada": 30.0},
+        {"nombre_servicio": "Reparación de Chapas y Codificación de Llaves Inteligentes", "tarifa_base_estimada": 80.0},
+        {"nombre_servicio": "Servicio de Auxilio Vial y Traslado en Grúa", "tarifa_base_estimada": 150.0},
+        {"nombre_servicio": "Mecánica Preventiva, Afinamiento y Reparación de Motor", "tarifa_base_estimada": 100.0},
+        {"nombre_servicio": "Mantenimiento Integral del Sistema de Refrigeración", "tarifa_base_estimada": 60.0}
     ]
     
     # Limpieza de servicios antiguos/duplicados
@@ -455,12 +455,12 @@ def vincular_taller_servicio(id_taller: int, request: dict, db: Session = Depend
 def get_especialidades_disponibles(db: Session = Depends(get_db)):
     import models
     standards = [
-        {"nombre_especialidad": "Electricista Automotriz", "descripcion": "Experto en baterías, alternadores, cableados y computadoras"},
-        {"nombre_especialidad": "Mecánico de Auxilio Rápido", "descripcion": "Reparaciones rápidas de motor, correas y bujías"},
-        {"nombre_especialidad": "Operador de Grúas y Rescate", "descripcion": "Amarre, izaje y transporte de vehículos"},
-        {"nombre_especialidad": "Cerrajero de Vehículos", "descripcion": "Apertura de cerraduras y reprogramación de llaves"},
-        {"nombre_especialidad": "Técnico en Suspensión y Neumáticos", "descripcion": "Diagnóstico de rines, llantas y amortiguadores"},
-        {"nombre_especialidad": "Especialista en Sistemas de Enfriamiento", "descripcion": "Control de radiadores, bombas de agua y termostatos"}
+        {"nombre_especialidad": "Electricista Automotriz", "descripcion": "Experto en diagnóstico por escáner, baterías, alternadores y cableados"},
+        {"nombre_especialidad": "Técnico en Suspensión y Neumáticos", "descripcion": "Diagnóstico y cambio de amortiguadores, frenos, rines y llantas"},
+        {"nombre_especialidad": "Mecánico de Auxilio Rápido", "descripcion": "Reparaciones rápidas de motor, correas, bujías y suministro de fluidos"},
+        {"nombre_especialidad": "Cerrajero de Vehículos", "descripcion": "Apertura de cerraduras y reprogramación de llaves inteligentes"},
+        {"nombre_especialidad": "Operador de Grúas y Rescate", "descripcion": "Amarre, izaje y traslado seguro de vehículos siniestrados"},
+        {"nombre_especialidad": "Especialista en Sistemas de Enfriamiento", "descripcion": "Control de radiadores, bombas de agua, fugas de refrigerante y termostatos"}
     ]
     # Limpieza de especialidades obsoletas
     nombres_validos_esp = [sp["nombre_especialidad"] for sp in standards]
