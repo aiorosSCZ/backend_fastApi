@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from database import SessionLocal
 import models
 import schemas
-from routers.auth import get_password_hash
+from crud import get_password_hash
 
 def create_super_admin():
     db = SessionLocal()
