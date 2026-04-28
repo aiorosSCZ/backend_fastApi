@@ -138,10 +138,10 @@ async def reportar_incidente(
             "distancia_km": taller["distancia_km"],
             "latitud": ubicacion_latitud,
             "longitud": ubicacion_longitud,
-            "transcripcion_audio": db_incidente.transcripcion_audio,
-            "url_audio_evidencia": db_incidente.url_audio_evidencia,
-            "url_foto_evidencia": db_incidente.url_foto_evidencia,
-            "evaluacion_ia": db_incidente.diagnostico_ia
+            "transcripcion_audio": ai_result.get("diagnostico_ia", "Sin transcripción."),
+            "url_audio_evidencia": f"uploads/{os.path.basename(audio_path)}" if audio_path else None,
+            "url_foto_evidencia": f"uploads/{os.path.basename(foto_path)}" if foto_path else None,
+            "evaluacion_ia": ai_result
         }
         asyncio.create_task(manager.send_personal_message(payload, taller["id_taller"]))
 
