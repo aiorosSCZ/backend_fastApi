@@ -478,6 +478,20 @@ def get_especialidades_disponibles(db: Session = Depends(get_db)):
     db.commit()
     return db.query(models.Especialidad).all()
 
+@router.get("/tecnicos/{id_tecnico}")
+def get_tecnico_perfil(id_tecnico: int, db: Session = Depends(get_db)):
+    import models
+    tecnico = db.query(models.Tecnico).filter(models.Tecnico.id_tecnico == id_tecnico).first()
+    if not tecnico:
+        raise HTTPException(status_code=404, detail="Técnico no encontrado")
+    return {
+        "id_tecnico": tecnico.id_tecnico,
+        "nombres": tecnico.nombres,
+        "apellidos": tecnico.apellidos,
+        "correo": tecnico.correo,
+        "taller": tecnico.taller.razon_social if tecnico.taller else "Taller Central"
+    }
+
 @router.get("/tecnicos/{id_tecnico}/especialidades")
 def get_tecnico_especialidades(id_tecnico: int, db: Session = Depends(get_db)):
     # Consulta directa de relación
