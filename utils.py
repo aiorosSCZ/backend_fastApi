@@ -40,7 +40,7 @@ def send_approval_email(destinatario: str, nombre_taller: str):
                         <li>Empezar a generar ingresos.</li>
                     </ul>
                     <div style="text-align: center; margin-top: 30px;">
-                        <a href="http://localhost:4200/login" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Acceder a mi Dashboard</a>
+                        <a href="https://asisscar.netlify.app/login" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Acceder a mi Dashboard</a>
                     </div>
                 </div>
                 <div style="background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 12px; color: #666;">
