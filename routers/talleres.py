@@ -226,24 +226,30 @@ def get_all_servicios(db: Session = Depends(get_db)):
     import models
     
     standard = [
-        {"nombre_servicio": "Batería", "tarifa_base_estimada": 50.0},
-        {"nombre_servicio": "Motor", "tarifa_base_estimada": 150.0},
-        {"nombre_servicio": "Frenos", "tarifa_base_estimada": 80.0},
-        {"nombre_servicio": "Llantas", "tarifa_base_estimada": 30.0},
-        {"nombre_servicio": "Remolque / Grúa", "tarifa_base_estimada": 120.0},
-        {"nombre_servicio": "Cerrajería", "tarifa_base_estimada": 60.0},
-        {"nombre_servicio": "Suministro de Combustible", "tarifa_base_estimada": 40.0},
-        {"nombre_servicio": "Electricidad en Ruta", "tarifa_base_estimada": 70.0},
-        {"nombre_servicio": "Fuga de Aceite / Fluidos", "tarifa_base_estimada": 55.0}
+        {"nombre_servicio": "Paso de Corriente / Cambio de Batería", "tarifa_base_estimada": 50.0},
+        {"nombre_servicio": "Cambio y Reparación de Llantas", "tarifa_base_estimada": 40.0},
+        {"nombre_servicio": "Suministro de Combustible", "tarifa_base_estimada": 30.0},
+        {"nombre_servicio": "Cerrajería Automotriz de Emergencia", "tarifa_base_estimada": 80.0},
+        {"nombre_servicio": "Servicio de Grúa / Remolque", "tarifa_base_estimada": 150.0},
+        {"nombre_servicio": "Mecánica Ligera en Ruta", "tarifa_base_estimada": 100.0},
+        {"nombre_servicio": "Fugas de Fluidos y Sobrecalentamiento", "tarifa_base_estimada": 60.0}
     ]
     
+    # Limpieza de servicios antiguos/duplicados
+    nombres_validos = [s["nombre_servicio"] for s in standard]
+    obsoletos = db.query(models.Servicio).filter(~models.Servicio.nombre_servicio.in_(nombres_validos)).all()
+    for obs in obsoletos:
+        db.query(models.TallerServicio).filter(models.TallerServicio.id_servicio == obs.id_servicio).delete()
+        db.delete(obs)
+    db.commit()
+
     for s in standard:
         existente = db.query(models.Servicio).filter(models.Servicio.nombre_servicio == s["nombre_servicio"]).first()
         if not existente:
             db_s = models.Servicio(**s)
             db.add(db_s)
     db.commit()
-    
+
     servicios = db.query(models.Servicio).all()
     return [{"id_servicio": s.id_servicio, "nombre_servicio": s.nombre_servicio} for s in servicios]
 
@@ -449,14 +455,22 @@ def vincular_taller_servicio(id_taller: int, request: dict, db: Session = Depend
 def get_especialidades_disponibles(db: Session = Depends(get_db)):
     import models
     standards = [
-        {"nombre_especialidad": "Baterías", "descripcion": "Cambio y diagnóstico de baterías"},
-        {"nombre_especialidad": "Mecánica Ligera", "descripcion": "Reparaciones menores en ruta"},
-        {"nombre_especialidad": "Sistema de Frenos", "descripcion": "Mantenimiento y purga de frenos"},
-        {"nombre_especialidad": "Remolque", "descripcion": "Asistencia de grúa en ruta"},
-        {"nombre_especialidad": "Cerrajería Automotriz", "descripcion": "Apertura de puertas bloqueadas"},
-        {"nombre_especialidad": "Electricidad Automotriz", "descripcion": "Fallas eléctricas"},
-        {"nombre_especialidad": "Refrigeración", "descripcion": "Diagnóstico de fugas y radiadores"}
+        {"nombre_especialidad": "Electricista Automotriz", "descripcion": "Experto en baterías, alternadores, cableados y computadoras"},
+        {"nombre_especialidad": "Mecánico de Auxilio Rápido", "descripcion": "Reparaciones rápidas de motor, correas y bujías"},
+        {"nombre_especialidad": "Operador de Grúas y Rescate", "descripcion": "Amarre, izaje y transporte de vehículos"},
+        {"nombre_especialidad": "Cerrajero de Vehículos", "descripcion": "Apertura de cerraduras y reprogramación de llaves"},
+        {"nombre_especialidad": "Técnico en Suspensión y Neumáticos", "descripcion": "Diagnóstico de rines, llantas y amortiguadores"},
+        {"nombre_especialidad": "Especialista en Sistemas de Enfriamiento", "descripcion": "Control de radiadores, bombas de agua y termostatos"}
     ]
+    # Limpieza de especialidades obsoletas
+    nombres_validos_esp = [sp["nombre_especialidad"] for sp in standards]
+    obsoletas = db.query(models.Especialidad).filter(~models.Especialidad.nombre_especialidad.in_(nombres_validos_esp)).all()
+    for obs in obsoletas:
+        # Remover relaciones muchos a muchos
+        obs.tecnicos.clear()
+        db.delete(obs)
+    db.commit()
+
     for sp in standards:
         existente = db.query(models.Especialidad).filter(models.Especialidad.nombre_especialidad == sp["nombre_especialidad"]).first()
         if not existente:
