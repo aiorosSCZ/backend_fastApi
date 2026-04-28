@@ -447,6 +447,21 @@ def vincular_taller_servicio(id_taller: int, request: dict, db: Session = Depend
 
 @router.get("/especialidades-disponibles")
 def get_especialidades_disponibles(db: Session = Depends(get_db)):
+    import models
+    standards = [
+        {"nombre_especialidad": "Baterías", "descripcion": "Cambio y diagnóstico de baterías"},
+        {"nombre_especialidad": "Mecánica Ligera", "descripcion": "Reparaciones menores en ruta"},
+        {"nombre_especialidad": "Sistema de Frenos", "descripcion": "Mantenimiento y purga de frenos"},
+        {"nombre_especialidad": "Remolque", "descripcion": "Asistencia de grúa en ruta"},
+        {"nombre_especialidad": "Cerrajería Automotriz", "descripcion": "Apertura de puertas bloqueadas"},
+        {"nombre_especialidad": "Electricidad Automotriz", "descripcion": "Fallas eléctricas"},
+        {"nombre_especialidad": "Refrigeración", "descripcion": "Diagnóstico de fugas y radiadores"}
+    ]
+    for sp in standards:
+        existente = db.query(models.Especialidad).filter(models.Especialidad.nombre_especialidad == sp["nombre_especialidad"]).first()
+        if not existente:
+            db.add(models.Especialidad(**sp))
+    db.commit()
     return db.query(models.Especialidad).all()
 
 @router.get("/tecnicos/{id_tecnico}/especialidades")
