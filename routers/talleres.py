@@ -196,13 +196,27 @@ def aprobar_taller(id_taller: int, db: Session = Depends(get_db)):
 @router.get("/{id_taller}/solicitudes")
 def get_taller_solicitudes(id_taller: int, db: Session = Depends(get_db)):
     import models
+    from services.matching_service import calcular_distancia
+    
+    taller = db.query(models.Taller).filter(models.Taller.id_taller == id_taller).first()
     incidentes = db.query(models.Incidente).filter(models.Incidente.estado_solicitud == 'Pendiente').all()
     resultados = []
+    
     for inc in incidentes:
+        distancia = 0.0
+        if taller and taller.ubicacion_base_latitud and taller.ubicacion_base_longitud and inc.ubicacion_latitud and inc.ubicacion_longitud:
+            distancia = round(calcular_distancia(
+                taller.ubicacion_base_latitud,
+                taller.ubicacion_base_longitud,
+                inc.ubicacion_latitud,
+                inc.ubicacion_longitud
+            ), 1)
+            
         resultados.append({
             "id_incidente": inc.id_incidente,
             "tipo_problema": inc.tipo_problema,
             "nivel_prioridad": inc.nivel_prioridad or "Media",
+            "distancia_km": distancia,
             "cliente": f"{inc.cliente.nombres} {inc.cliente.apellidos}" if inc.cliente else "Conductor en Ruta",
             "vehiculo": f"{inc.vehiculo.marca} {inc.vehiculo.modelo} ({inc.vehiculo.color})" if inc.vehiculo else "Vehículo",
             "transcripcion_audio": inc.descripcion_manual,
@@ -210,6 +224,7 @@ def get_taller_solicitudes(id_taller: int, db: Session = Depends(get_db)):
             "longitud": inc.ubicacion_longitud
         })
     return resultados
+
 
 @router.post("/{id_taller}/tecnicos", response_model=schemas.TecnicoResponse)
 def create_tecnico_endpoint(id_taller: int, tecnico: schemas.TecnicoCreate, db: Session = Depends(get_db)):
