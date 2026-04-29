@@ -37,10 +37,11 @@ def crear_intento_pago(payload: dict, db: Session = Depends(get_db)):
                     monto_comision_plataforma=(monto / 100) * 0.10,
                     monto_total_cliente=monto / 100,
                     metodo_pago="Tarjeta de Crédito (Stripe)",
-                    estado_transaccion="Pendiente"
+                    estado_transaccion="Aprobado"
                 )
                 db.add(nuevo_pago)
                 db.commit()
+
 
         return {
             "paymentIntent": intent['client_secret'],
@@ -77,7 +78,8 @@ def get_cliente_pagos(id_cliente: int, db: Session = Depends(get_db)):
             "metodo": pago.metodo_pago,
             "estado": pago.estado_transaccion,
             "fecha": inc.fecha_hora_reporte.strftime("%Y-%m-%d %H:%M") if inc and inc.fecha_hora_reporte else "N/A",
-            "taller": asis.taller.nombre_taller if asis and asis.taller else "Taller Desconocido"
+            "taller": asis.taller.razon_social if asis and asis.taller else "Taller Desconocido"
+
         })
         
     return resultados

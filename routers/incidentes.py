@@ -36,13 +36,35 @@ def get_incidente_tracking(id_incidente: int, db: Session = Depends(get_db)):
         lat_tec = asistencia.tecnico.ubicacion_actual_latitud
         lng_tec = asistencia.tecnico.ubicacion_actual_longitud
         
+    costo = 50.0
+    if incidente.nivel_prioridad == "Alta":
+        costo = 80.0
+    elif incidente.nivel_prioridad == "Media":
+        costo = 50.0
+    elif incidente.nivel_prioridad == "Baja":
+        costo = 30.0
+
+    pago_completado = False
+    if asistencia and asistencia.pago:
+        if asistencia.pago.estado_transaccion == "Aprobado":
+            pago_completado = True
+
     return {
         "estado": incidente.estado_solicitud,
+        "tipo_problema": incidente.tipo_problema,
+        "nivel_prioridad": incidente.nivel_prioridad,
+        "diagnostico_ia": incidente.analisis_ia.resumen_estructurado if incidente.analisis_ia else "Sin diagnóstico",
         "lat_cliente": incidente.ubicacion_latitud,
         "lng_cliente": incidente.ubicacion_longitud,
         "lat_tecnico": lat_tec or -17.7780,
-        "lng_tecnico": lng_tec or -63.1750
+        "lng_tecnico": lng_tec or -63.1750,
+        "taller_nombre": asistencia.taller.razon_social if (asistencia and asistencia.taller) else "Taller AsistAuto",
+        "monto_pago": costo,
+        "pago_completado": pago_completado
     }
+
+
+
 
 # Eliminado endpoint duplicado /aceptar
 

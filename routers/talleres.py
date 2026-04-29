@@ -384,6 +384,19 @@ def get_taller_trabajos(id_taller: int, db: Session = Depends(get_db)):
         inc = asis.incidente
         if not inc:
             continue
+        pago_monto = 0.0
+        if asis.pago:
+            pago_monto = float(asis.pago.monto_total_cliente)
+        else:
+            if inc.nivel_prioridad == "Alta":
+                pago_monto = 80.0
+            elif inc.nivel_prioridad == "Media":
+                pago_monto = 50.0
+            elif inc.nivel_prioridad == "Baja":
+                pago_monto = 30.0
+            else:
+                pago_monto = 50.0
+
         resultados.append({
             "id_incidente": inc.id_incidente,
             "estado": inc.estado_solicitud,
@@ -392,9 +405,13 @@ def get_taller_trabajos(id_taller: int, db: Session = Depends(get_db)):
             "problema": inc.tipo_problema,
             "prioridad": inc.nivel_prioridad or "Media",
             "tecnico": f"{asis.tecnico.nombres} {asis.tecnico.apellidos}" if asis.tecnico else "Sin asignar",
-            "monto": 50.0
+            "monto": pago_monto,
+            "latitud": inc.ubicacion_latitud,
+            "longitud": inc.ubicacion_longitud
         })
+
     return resultados
+
 
 @router.get("/tecnicos/{id_tecnico}/trabajos")
 def get_tecnico_trabajos(id_tecnico: int, db: Session = Depends(get_db)):

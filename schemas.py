@@ -79,9 +79,12 @@ class TecnicoResponse(TecnicoBase):
     en_turno: bool
     primer_login: bool
     estado_operativo: str
+    ubicacion_actual_latitud: Optional[float] = None
+    ubicacion_actual_longitud: Optional[float] = None
     especialidades: List[EspecialidadResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
+
 
 # schemas/responses intermedios
 class VehiculoBase(BaseModel):
