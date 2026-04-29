@@ -212,6 +212,20 @@ def get_taller_solicitudes(id_taller: int, db: Session = Depends(get_db)):
                 inc.ubicacion_longitud
             ), 1)
             
+        url_audio = None
+        url_foto = None
+        for ev in inc.evidencias:
+            if ev.tipo_recurso == "Audio":
+                url_audio = ev.url_archivo
+            elif ev.tipo_recurso == "Foto":
+                url_foto = ev.url_archivo
+
+        evaluacion_ia = "Calculando diagnóstico..."
+        if inc.analisis_ia:
+            evaluacion_ia = inc.analisis_ia.resumen_estructurado or "Sin diagnóstico"
+
+        baseUrl = "https://backend-fastapi-su7t.onrender.com"
+            
         resultados.append({
             "id_incidente": inc.id_incidente,
             "tipo_problema": inc.tipo_problema,
@@ -220,10 +234,14 @@ def get_taller_solicitudes(id_taller: int, db: Session = Depends(get_db)):
             "cliente": f"{inc.cliente.nombres} {inc.cliente.apellidos}" if inc.cliente else "Conductor en Ruta",
             "vehiculo": f"{inc.vehiculo.marca} {inc.vehiculo.modelo} ({inc.vehiculo.color})" if inc.vehiculo else "Vehículo",
             "transcripcion_audio": inc.descripcion_manual,
+            "url_audio_evidencia": f"{baseUrl}/{url_audio}" if url_audio else None,
+            "url_foto_evidencia": f"{baseUrl}/{url_foto}" if url_foto else None,
+            "evaluacion_ia": evaluacion_ia,
             "latitud": inc.ubicacion_latitud,
             "longitud": inc.ubicacion_longitud
         })
     return resultados
+
 
 
 @router.post("/{id_taller}/tecnicos", response_model=schemas.TecnicoResponse)

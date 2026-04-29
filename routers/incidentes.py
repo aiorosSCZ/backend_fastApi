@@ -98,6 +98,24 @@ async def reportar_incidente(
     db.commit()
     db.refresh(db_incidente)
     
+    # Guardar en Evidencia
+    if audio_path:
+        db_audio = models.Evidencia(
+            id_incidente=db_incidente.id_incidente,
+            tipo_recurso="Audio",
+            url_archivo=f"uploads/{os.path.basename(audio_path)}"
+        )
+        db.add(db_audio)
+        
+    if foto_path:
+        db_foto = models.Evidencia(
+            id_incidente=db_incidente.id_incidente,
+            tipo_recurso="Foto",
+            url_archivo=f"uploads/{os.path.basename(foto_path)}"
+        )
+        db.add(db_foto)
+    db.commit()
+
     # Guardar el desglose detallado en AnalisisIA
     db_analisis = models.AnalisisIA(
         id_incidente=db_incidente.id_incidente,
@@ -106,6 +124,7 @@ async def reportar_incidente(
     )
     db.add(db_analisis)
     db.commit()
+
     
     # Búsqueda Geoespacial de Talleres (Fase 3)
     from services.matching_service import buscar_talleres_cercanos
