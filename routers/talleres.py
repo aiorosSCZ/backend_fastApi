@@ -57,18 +57,21 @@ def login(request: schemas_auth.LoginRequest, db: Session = Depends(get_db)):
 
     # 1. Intentar como Taller
     db_taller = db.query(models.Taller).filter(models.Taller.correo == correo_limpio).first()
-    if db_taller and crud.verify_password(request.password, db_taller.password_hash):
-        return {
-            "access_token": "fake-jwt-token-taller",
-            "token_type": "bearer",
-            "user_id": db_taller.id_taller,
-            "user_name": db_taller.razon_social,
-            "nit": db_taller.nit,
-            "direccion": db_taller.direccion_fisica,
-            "role": "taller"
-        }
+    if not db_taller:
+        raise HTTPException(status_code=404, detail="El usuario no existe")
         
-    # 2. Intentar como Admin
+    if not crud.verify_password(request.password, db_taller.password_hash):
+        raise HTTPException(status_code=401, detail="Contraseña incorrecta")
+
+    return {
+        "access_token": "fake-jwt-token-taller",
+        "token_type": "bearer",
+        "user_id": db_taller.id_taller,
+        "user_name": db_taller.razon_social,
+        "nit": db_taller.nit,
+        "direccion": db_taller.direccion_fisica,
+        "role": "taller"
+    }
     
     # Crear admin por defecto si la tabla está vacía
     admins_count = db.query(models.Admin).count()
