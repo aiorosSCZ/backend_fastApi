@@ -74,12 +74,15 @@ def get_cliente_pagos(id_cliente: int, db: Session = Depends(get_db)):
         resultados.append({
             "id_pago": pago.id_pago,
             "id_asistencia": pago.id_asistencia,
+            "id_incidente": inc.id_incidente if inc else None,
             "monto": float(pago.monto_total_cliente),
             "metodo": pago.metodo_pago,
             "estado": pago.estado_transaccion,
             "fecha": inc.fecha_hora_reporte.strftime("%Y-%m-%d %H:%M") if inc and inc.fecha_hora_reporte else "N/A",
-            "taller": asis.taller.razon_social if asis and asis.taller else "Taller Desconocido"
-
+            "taller": asis.taller.razon_social if asis and asis.taller else "Taller Desconocido",
+            "problema": inc.tipo_problema if inc else "Auxilio Vial"
         })
+
+
         
     return resultados
