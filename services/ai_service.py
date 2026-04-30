@@ -34,18 +34,25 @@ class AIService:
             # 1. Agregar descripción de texto
             prompt = (
                 "Actúa como un experto mecánico automotriz. Analiza los siguientes datos de una emergencia vehicular "
+                "(que pueden incluir texto, una imagen o foto adjunta del problema/tablero, y/o un audio descriptivo) "
                 "y responde únicamente en formato JSON con la siguiente estructura:\n"
                 "{\n"
                 '  "categoria": "Motor | Eléctrico | Frenos | Llantas | Suspensión | Otro",\n'
                 '  "urgencia": "Alta | Media | Baja",\n'
-                '  "diagnostico_ia": "Diagnóstico inicial de la falla + consejos/herramientas recomendadas para el mecánico.",\n'
+                '  "diagnostico_ia": "Diagnóstico inicial de la falla basándote en TODOS los datos proporcionados (texto, imagen, audio) + consejos/herramientas recomendadas.",\n'
                 '  "especialidad_requerida": "Mecánico general, Electricista, etc."\n'
                 "}\n\n"
                 "Reglas para asignar 'urgencia':\n"
                 "- Alta: Si compromete la seguridad inmediata o hay peligro físico (ej: fallan frenos, humo/fuego).\n"
                 "- Media: El auto está varado pero el usuario no corre peligro (ej: batería muerta, llanta pinchada).\n"
                 "- Baja: El auto funciona pero tiene ruidos o averías menores (ej: aire acondicionado).\n\n"
-                f"Texto del usuario: {descripcion_texto}"
+                "IMPORTANTE: Presta extrema atención a la imagen y/o audio adjunto (si existen). "
+                "Si la imagen muestra un tablero de instrumentos, identifica qué luces o indicadores están encendidos "
+                "(por ejemplo: falta de combustible, check engine, presión de aceite, etc.) y úsalo para el diagnóstico.\n"
+                "REGLA DE CONTRADICCIÓN: Si lo que describe el usuario en texto/audio no coincide con la evidencia visual "
+                "de la foto (ej. dice llanta pinchada pero ves humo en el motor), dale SIEMPRE mayor prioridad a tu propio "
+                "análisis de la FOTO. Menciona la discrepancia en tu diagnóstico.\n\n"
+                f"Texto del usuario: {descripcion_texto if descripcion_texto else 'Sin texto descriptivo'}"
             )
             contents.append(prompt)
             
