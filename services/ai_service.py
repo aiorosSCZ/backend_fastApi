@@ -49,9 +49,11 @@ class AIService:
                 "IMPORTANTE: Presta extrema atención a la imagen y/o audio adjunto (si existen). "
                 "Si la imagen muestra un tablero de instrumentos, identifica qué luces o indicadores están encendidos "
                 "(por ejemplo: falta de combustible, check engine, presión de aceite, etc.) y úsalo para el diagnóstico.\n"
-                "REGLA DE CONTRADICCIÓN: Si lo que describe el usuario en texto/audio no coincide con la evidencia visual "
-                "de la foto (ej. dice llanta pinchada pero ves humo en el motor), dale SIEMPRE mayor prioridad a tu propio "
-                "análisis de la FOTO. Menciona la discrepancia en tu diagnóstico.\n\n"
+                "SÍNTESIS MULTIMODAL (Unificación de criterios):\n"
+                "Tienes que UNIFICAR todos los datos proporcionados (Foto, Audio y Texto) para dar un diagnóstico lógico.\n"
+                "1. Si el texto o audio describe un síntoma (ej: 'mi auto no se mueve') y la foto muestra la causa (ej: 'llanta reventada' o 'tablero sin gasolina'), "
+                "crea un diagnóstico que conecte ambas cosas (ej: 'El cliente reporta que el auto no se mueve debido a que, según la imagen, tiene una llanta reventada').\n"
+                "2. Solo si existe una contradicción directa grave, dale mayor prioridad a tu propio análisis de la FOTO y el AUDIO, mencionando la discrepancia.\n\n"
                 f"Texto del usuario: {descripcion_texto if descripcion_texto else 'Sin texto descriptivo'}"
             )
             contents.append(prompt)
