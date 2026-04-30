@@ -168,7 +168,6 @@ async def reportar_incidente(
     
     # Notificaciones WebSocket en tiempo real
     from main import manager
-    import asyncio
     
     for taller in talleres_cercanos:
         payload = {
@@ -184,7 +183,7 @@ async def reportar_incidente(
             "url_foto_evidencia": f"uploads/{os.path.basename(foto_path)}" if foto_path else None,
             "evaluacion_ia": ai_result
         }
-        asyncio.create_task(manager.send_personal_message(payload, taller["id_taller"]))
+        await manager.send_personal_message(payload, taller["id_taller"])
 
     return {
         "status": "success",

@@ -423,13 +423,25 @@ def get_tecnico_trabajos(id_tecnico: int, db: Session = Depends(get_db)):
         inc = asis.incidente
         if not inc:
             continue
+            
+        pago_monto = 50.0
+        if asis.pago:
+            pago_monto = float(asis.pago.monto_total_cliente)
+        else:
+            if inc.nivel_prioridad == "Alta": pago_monto = 80.0
+            elif inc.nivel_prioridad == "Baja": pago_monto = 30.0
+
         resultados.append({
             "id": f"INC-{inc.id_incidente}",
             "id_incidente": inc.id_incidente,
             "estado": inc.estado_solicitud,
-            "cliente": f"{inc.cliente.nombres} {inc.cliente.apellidos}",
-            "vehiculo": f"{inc.vehiculo.marca} {inc.vehiculo.modelo} ({inc.vehiculo.color}) | Placa: {inc.vehiculo.placa} | Año: {inc.vehiculo.año} | Transmisión: {inc.vehiculo.tipo_transmision}",
+            "cliente": f"{inc.cliente.nombres} {inc.cliente.apellidos}" if inc.cliente else "Conductor",
+            "vehiculo": f"{inc.vehiculo.marca} {inc.vehiculo.modelo} ({inc.vehiculo.color}) | Placa: {inc.vehiculo.placa} | Año: {inc.vehiculo.año} | Transmisión: {inc.vehiculo.tipo_transmision}" if inc.vehiculo else "Vehículo",
             "problema": inc.tipo_problema,
+            "servicio": inc.tipo_problema,
+            "tipo": inc.tipo_problema,
+            "fecha": inc.fecha_hora_reporte.strftime("%Y-%m-%d %H:%M") if inc.fecha_hora_reporte else "N/A",
+            "monto": pago_monto,
             "prioridad": inc.nivel_prioridad or "Media",
             "lat": inc.ubicacion_latitud,
             "lng": inc.ubicacion_longitud

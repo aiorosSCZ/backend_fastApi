@@ -40,6 +40,11 @@ def crear_intento_pago(payload: dict, db: Session = Depends(get_db)):
                     estado_transaccion="Aprobado"
                 )
                 db.add(nuevo_pago)
+                
+                incidente = db.query(models.Incidente).filter(models.Incidente.id_incidente == id_incidente).first()
+                if incidente:
+                    incidente.estado_solicitud = "Completado"
+                
                 db.commit()
 
 
