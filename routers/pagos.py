@@ -46,6 +46,18 @@ def crear_intento_pago(payload: dict, db: Session = Depends(get_db)):
                     incidente.estado_solicitud = "Completado"
                 
                 db.commit()
+                
+                # Enviar notificación Push al técnico informando que ya se pagó
+                try:
+                    from services.firebase_service import send_push_notification
+                    if asistencia.tecnico and asistencia.tecnico.fcm_token:
+                        send_push_notification(
+                            fcm_token=asistencia.tecnico.fcm_token,
+                            titulo="¡Pago Recibido! 💰",
+                            mensaje=f"El cliente ha pagado el servicio. El incidente ha sido marcado como Completado."
+                        )
+                except Exception as e:
+                    print(f"Error enviando notificación de pago: {e}")
 
 
         return {
